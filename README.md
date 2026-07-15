@@ -43,9 +43,6 @@ Before running the server, seed your MongoDB Atlas database with test accounts, 
 python database/seed.py
 ```
 
-**Seeded Accounts**:
-- **Rider (User):** `user@gmail.com` / `user123`
-- **Admin:** `admin@gmail.com` / `admin123`
 
 ### 5. Run the Server
 Start the development server:
