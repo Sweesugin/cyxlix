@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Carbon Savings Dashboard - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom">
+        <h2 class="fw-bold text-primary"><i class="fa-solid fa-leaf text-success me-2"></i>My Carbon Savings Dashboard</h2>
+        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-glass"><i class="fa-solid fa-chevron-left me-2"></i>Back to Dashboard</a>
+    </div>
+
+    <!-- Stats Widget Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card metric-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.8rem;">Aggregated CO₂ Saved</h6>
+                        <h3 class="mb-0 fw-bold">{{ "%.2f"|format(carbon_stats.total_co2) }} kg</h3>
+                    </div>
+                    <div class="metric-icon-container metric-icon-green">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-secondary fs-8">Equivalent to planting {{ "%.1f"|format(carbon_stats.total_co2 / 0.06) }} tree-days</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card metric-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.8rem;">Aggregated Money Saved</h6>
+                        <h3 class="mb-0 fw-bold">₹{{ "%.2f"|format(carbon_stats.total_money) }}</h3>
+                    </div>
+                    <div class="metric-icon-container metric-icon-cyan">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-secondary fs-8">Compared to compact gasoline car costs</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card metric-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.8rem;">Aggregated Distance</h6>
+                        <h3 class="mb-0 fw-bold">{{ "%.1f"|format(carbon_stats.total_distance) }} km</h3>
+                    </div>
+                    <div class="metric-icon-container metric-icon-purple">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-secondary fs-8">Total healthy miles cycled</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="glass-card metric-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-secondary text-uppercase mb-1" style="font-size: 0.8rem;">Eco Score Rating</h6>
+                        <h3 class="mb-0 fw-bold">{{ carbon_stats.eco_score }} / 100</h3>
+                    </div>
+                    <div class="metric-icon-container metric-icon-green" style="background: rgba(245,158,11,0.15); color: #f59e0b; border-color: rgba(245,158,11,0.2);">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-secondary fs-8">Score increases with longer rides</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Graphics Section -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <h4 class="mb-4 text-primary"><i class="fa-solid fa-chart-line text-info me-2"></i>Carbon Savings Progress Chart</h4>
+                <div style="position: relative; height: 350px;">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Logs Table -->
+    <div class="glass-card p-4">
+        <h4 class="mb-4 text-primary"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i>Ride History & CO₂ Log</h4>
+        {% if history %}
+            <div class="table-responsive">
+                <table class="table-glass w-100">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Ride ID</th>
+                            <th>Distance</th>
+                            <th>CO₂ Offset</th>
+                            <th>Money Saved</th>
+                            <th>Eco Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in history %}
+                        <tr>
+                            <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') if entry.timestamp }}</td>
+                            <td class="font-monospace text-secondary fs-8">{{ entry.ride_id }}</td>
+                            <td class="fw-semibold">{{ entry.distance_km }} km</td>
+                            <td class="text-success font-monospace">+{{ entry.carbon_saved_kg }} kg</td>
+                            <td class="text-info font-monospace">₹{{ "%.2f"|format(entry.money_saved) }}</td>
+                            <td>
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-35 py-1 px-2.5">
+                                    {{ entry.eco_score }} pts
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-secondary mb-0 py-3">No ride savings records found yet. Go start your first ride with companion mode!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('savingsChart').getContext('2d');
+    
+    // Inject data from Flask/Jinja
+    const chartLabels = [
+        {% for entry in history|reverse %}
+            "{{ entry.timestamp.strftime('%b %d') }}",
+        {% endfor %}
+    ];
+    
+    const co2Data = [
+        {% for entry in history|reverse %}
+            {{ entry.carbon_saved_kg }},
+        {% endfor %}
+    ];
+
+    const moneyData = [
+        {% for entry in history|reverse %}
+            {{ entry.money_saved }},
+        {% endfor %}
+    ];
+
+    // Standard Chart.js configuration
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [
+                {
+                    label: 'CO2 Saved (kg)',
+                    data: co2Data,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.3,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Money Saved (₹)',
+                    data: moneyData,
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.05)',
+                    borderWidth: 2.5,
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.3,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#64748b',
+                        font: { family: "'Outfit', sans-serif", size: 12 }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: { color: '#64748b' }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: 'rgba(0, 0, 0, 0.04)' },
+                    ticks: { color: '#10b981' },
+                    title: { display: true, text: 'CO2 Offset (KG)', color: '#10b981' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false }, // avoid grid overlap
+                    ticks: { color: '#0284c7' },
+                    title: { display: true, text: 'Money Saved (INR)', color: '#0284c7' }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

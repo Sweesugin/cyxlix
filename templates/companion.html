@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Companion Mode - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom border-secondary">
+        <h2 class="text-primary fw-bold"><i class="fa-solid fa-shield-halved me-2"></i>Smart Companion Mode</h2>
+        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-glass"><i class="fa-solid fa-chevron-left me-2"></i>Back to Dashboard</a>
+    </div>
+
+    {% if last_ride_stats %}
+    <div class="glass-card mb-4 border-0 p-4 shadow-sm" style="border-left: 5px solid #00f2fe !important;">
+        <h4 class="text-success fw-bold mb-3"><i class="fa-solid fa-circle-check me-2"></i>Ride Completed Successfully</h4>
+        <div class="row g-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded text-center border">
+                    <span class="text-secondary fs-8 d-block mb-1">Distance</span>
+                    <h5 class="fw-bold mb-0 text-dark">{{ "%.2f"|format(last_ride_stats.distance) }} km</h5>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded text-center border">
+                    <span class="text-secondary fs-8 d-block mb-1">CO₂ Saved</span>
+                    <h5 class="fw-bold mb-0 text-success">{{ "%.2f"|format(last_ride_stats.co2_saved) }} kg</h5>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded text-center border">
+                    <span class="text-secondary fs-8 d-block mb-1">Money Saved</span>
+                    <h5 class="fw-bold mb-0 text-info">₹{{ "%.2f"|format(last_ride_stats.money_saved) }}</h5>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 bg-light rounded text-center border">
+                    <span class="text-secondary fs-8 d-block mb-1">Eco Score</span>
+                    <h5 class="fw-bold mb-0 text-warning">{{ last_ride_stats.eco_score }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        <!-- Centered Live Ride Companion -->
+        <div class="col-lg-8 mx-auto">
+            <!-- Hidden form submitted via JS when ride ends -->
+            <form id="companion-form" action="{{ url_for('save_companion_ride') }}" method="POST" class="d-none">
+                <input type="hidden" name="duration_seconds" id="final-seconds" value="0">
+                <input type="hidden" name="distance_km" id="final-distance" value="0">
+                <input type="hidden" name="route_note" id="form-route-note" value="">
+                <input type="hidden" name="bicycle_id" id="form-bike-id" value="">
+            </form>
+
+            <div class="glass-card companion-live-card p-4">
+                <h4 class="mb-4 text-center">Live Ride Companion</h4>
+                
+                <!-- Stopwatch Display -->
+                <div class="timer-container mb-4">
+                    <div class="pulse-ring"></div>
+                    <div class="timer-circle" id="live-stopwatch">00:00:00</div>
+                </div>
+
+                <!-- Simulation Stats Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="p-3 bg-light border rounded text-center">
+                            <span class="text-secondary fs-8 d-block mb-1">Current Speed</span>
+                            <h4 id="live-speed" class="font-monospace mb-0 text-dark">0.0 km/h</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light border rounded text-center">
+                            <span class="text-secondary fs-8 d-block mb-1">Distance Travelled</span>
+                            <h4 id="live-distance" class="font-monospace mb-0 text-dark">0.00 km</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light border rounded text-center">
+                            <span class="text-secondary fs-8 d-block mb-1">CO₂ Offset</span>
+                            <h4 id="live-carbon" class="text-success font-monospace mb-0">0.00 kg</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 bg-light border rounded text-center">
+                            <span class="text-secondary fs-8 d-block mb-1">Money Saved</span>
+                            <h4 id="live-savings" class="text-info font-monospace mb-0">₹0.00</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons Area -->
+                <div class="d-flex justify-content-center align-items-center gap-3">
+                    <button class="btn btn-gradient-cyan btn-lg px-5 py-3 fs-5" id="start-ride-btn">
+                        <i class="fa-solid fa-play me-2"></i>Start Journey
+                    </button>
+                    <button class="btn btn-outline-danger btn-lg px-5 py-3 fs-5 d-none" id="end-ride-btn">
+                        <i class="fa-solid fa-square me-2"></i>End Journey
+                    </button>
+                    <button class="sos-button animate-pulse" id="sos-btn" title="Emergency Help SOS">SOS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}AI Support Assistant - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom">
+                <h2 class="fw-bold text-primary"><i class="fa-regular fa-comments text-success me-2"></i>AI Support Assistant</h2>
+                <a href="{{ url_for('home') }}" class="btn btn-outline-glass"><i class="fa-solid fa-house me-2"></i>Home</a>
+            </div>
+
+            <!-- Chat interface card -->
+            <div class="glass-card chat-container">
+                <!-- Header -->
+                <div class="p-3 border-bottom d-flex align-items-center">
+                    <div class="rounded-circle bg-success bg-opacity-25 text-success d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Cyxlix Bot</h6>
+                        <span class="text-secondary fs-8"><i class="fa-solid fa-circle text-success me-1 fs-9"></i>Online & Ready</span>
+                    </div>
+                </div>
+
+                <!-- Messages area -->
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message-bubble bot-msg">
+                        Hello! I am your <strong>Cyxlix AI Assistant</strong>. Ask me anything about bicycle rentals, booking procedures, pricing structures, carbon savings, weather forecasts, or general riding rules!
+                    </div>
+                </div>
+
+                <!-- Quick Action Chips -->
+                <div class="chip-container">
+                    <span class="chat-chip">Bicycle rental cost?</span>
+                    <span class="chat-chip">How do I reserve a ride?</span>
+                    <span class="chat-chip">How does the queue work?</span>
+                    <span class="chat-chip">Safety guidelines?</span>
+                    <span class="chat-chip">Carbon calculations?</span>
+                </div>
+
+                <!-- Input area -->
+                <div class="p-3 border-top">
+                    <form id="chat-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-glass" id="chat-input" placeholder="Type your question..." autocomplete="off" required>
+                            <button class="btn btn-gradient-cyan px-4" type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

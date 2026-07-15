@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Cyxlix - Eco-Friendly Bike Rentals{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5 text-center position-relative overflow-hidden" style="background: radial-gradient(circle at top right, rgba(2, 132, 199, 0.08), transparent), radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent);">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-start">
+                <h1 class="display-3 fw-bold mb-3" style="line-height: 1.1;">
+                    The Smart Way to <br>
+                    <span style="background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-green) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Rent & Commute</span>
+                </h1>
+                <p class="lead text-secondary mb-4 fs-4" style="max-width: 550px;">
+                    Ride premium bicycles, optimize your budget, track carbon savings in real-time, and get AI-powered companion safety tips all in one portal.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('bicycles_list') }}" class="btn btn-gradient-cyan btn-lg px-4 py-3"><i class="fa-solid fa-bicycle me-2"></i>Explore Bicycles</a>
+                    {% if not session.get('user_id') and not session.get('admin_id') %}
+                        <a href="{{ url_for('register') }}" class="btn btn-outline-glass btn-lg px-4 py-3">Get Started</a>
+                    {% else %}
+                        <a href="{{ url_for('user_dashboard') if session.get('user_id') else url_for('admin_dashboard') }}" class="btn btn-outline-glass btn-lg px-4 py-3">Go to Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 mt-5 mt-lg-0 text-center">
+                <div class="position-relative d-inline-block">
+                    <!-- Glowing circular background decoration -->
+                    <div class="position-absolute top-50 start-50 translate-middle rounded-circle" style="width: 280px; height: 280px; background: radial-gradient(circle, var(--neon-cyan-glow) 0%, transparent 70%); filter: blur(20px);"></div>
+                    <img src="{{ url_for('static', filename='images/bike_electric.svg') }}" alt="Sleek Smart Bike" class="img-fluid position-relative" style="max-width: 380px; transform: scale(1.15); filter: drop-shadow(0 15px 30px rgba(2, 132, 199, 0.15));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Counter Grid -->
+<div class="py-5 border-top border-bottom" style="background: #ffffff;">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-4">
+                    <h2 class="display-5 fw-bold mb-1">50+</h2>
+                    <p class="text-secondary mb-0">Premium Bikes</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-4">
+                    <h2 class="display-5 fw-bold mb-1" style="color: var(--neon-green) !important;">12.4k</h2>
+                    <p class="text-secondary mb-0">KG CO₂ Saved</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-4">
+                    <h2 class="display-5 fw-bold mb-1" style="color: var(--neon-cyan) !important;">₹1.5L+</h2>
+                    <p class="text-secondary mb-0">Rider Savings</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-4">
+                    <h2 class="display-5 fw-bold mb-1">2,500+</h2>
+                    <p class="text-secondary mb-0">Active Commutes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-2">Cycle Smarter, Live Greener</h2>
+        <p class="text-secondary" style="max-width: 600px; margin: 0 auto;">Equipped with features designed to bring ease, ecological awareness, and safety directly to your daily commute.</p>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Feature 1: Budget Planner -->
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="metric-icon-container metric-icon-cyan mb-4">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <h4 class="mb-3 d-flex align-items-center justify-content-between">
+                    Smart Budget Planner
+                    {% if not session.get('user_id') %}
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i>Locked</span>
+                    {% endif %}
+                </h4>
+                <p class="text-secondary">Input your budget limits, ride duration, and target distances to get custom bicycle plans matching your finances perfectly.</p>
+                <a href="{{ url_for('budget_planner') }}" class="text-info nav-link p-0 mt-3 d-inline-flex align-items-center">
+                    Plan Budget <i class="fa-solid fa-arrow-right ms-2 fs-7"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Feature 2: Carbon Tracker -->
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="metric-icon-container metric-icon-green mb-4">
+                    <i class="fa-solid fa-leaf"></i>
+                </div>
+                <h4 class="mb-3 d-flex align-items-center justify-content-between">
+                    Carbon Savings Dashboard
+                    {% if not session.get('user_id') %}
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i>Locked</span>
+                    {% endif %}
+                </h4>
+                <p class="text-secondary">Monitor your active contribution to the environment. Compare emissions against cars and view total distance and eco points.</p>
+                <a href="{{ url_for('carbon_savings') }}" class="text-success nav-link p-0 mt-3 d-inline-flex align-items-center">
+                    Check Impact <i class="fa-solid fa-arrow-right ms-2 fs-7"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Feature 3: Companion Mode -->
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="metric-icon-container metric-icon-purple mb-4">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h4 class="mb-3 d-flex align-items-center justify-content-between">
+                    Companion Safety Mode
+                    {% if not session.get('user_id') %}
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i>Locked</span>
+                    {% endif %}
+                </h4>
+                <p class="text-secondary">Initiate companion mode to get live timers, emergency assistance options, maps, safety tips, and logs of your rides.</p>
+                <a href="{{ url_for('companion_mode') }}" class="text-primary nav-link p-0 mt-3 d-inline-flex align-items-center">
+                    Launch Companion <i class="fa-solid fa-arrow-right ms-2 fs-7"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Feature 4: AI chatbot -->
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="metric-icon-container metric-icon-green mb-4">
+                    <i class="fa-regular fa-comments"></i>
+                </div>
+                <h4 class="mb-3 d-flex align-items-center justify-content-between">
+                    AI Chatbot Assistant
+                    {% if not session.get('user_id') %}
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i>Locked</span>
+                    {% endif %}
+                </h4>
+                <p class="text-secondary">Have instant questions about ride rules, costs, active booking extensions, or booking status? Chat with our smart bot anytime.</p>
+                <a href="{{ url_for('chatbot_page') }}" class="text-success nav-link p-0 mt-3 d-inline-flex align-items-center">
+                    Chat with Bot <i class="fa-solid fa-arrow-right ms-2 fs-7"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Feature 5: Reservation Queue -->
+        <div class="col-md-4">
+            <div class="glass-card p-4 h-100">
+                <div class="metric-icon-container metric-icon-purple mb-4" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.2)">
+                    <i class="fa-solid fa-list-ol"></i>
+                </div>
+                <h4 class="mb-3 d-flex align-items-center justify-content-between">
+                    Bicycle Reservation Queue
+                    {% if not session.get('user_id') %}
+                        <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i>Locked</span>
+                    {% endif %}
+                </h4>
+                <p class="text-secondary">If your favorite bicycle is out on lease, join the waitlist queue. Receive notifications when it is returned.</p>
+                <a href="{{ url_for('reservation_queue') }}" class="text-danger nav-link p-0 mt-3 d-inline-flex align-items-center">
+                    Browse Queue <i class="fa-solid fa-arrow-right ms-2 fs-7"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

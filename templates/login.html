@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="glass-card p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">Welcome Back</h2>
+                    <p class="text-secondary">Access your Cyxlix account dashboard</p>
+                </div>
+                
+                <!-- Nav Tabs for User vs Admin Login -->
+                <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-3" id="loginTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab != 'admin' %}active{% endif %}" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-login" type="button" role="tab" aria-controls="user-login" aria-selected="{% if active_tab != 'admin' %}true{% else %}false{% endif %}">
+                            <i class="fa-solid fa-bicycle me-2"></i>Rider
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab == 'admin' %}active{% endif %}" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin-login" type="button" role="tab" aria-controls="admin-login" aria-selected="{% if active_tab == 'admin' %}true{% else %}false{% endif %}">
+                            <i class="fa-solid fa-user-shield me-2"></i>Admin
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="loginTabContent">
+                    <!-- User (Rider) Login Form -->
+                    <div class="tab-pane fade {% if active_tab != 'admin' %}show active{% endif %}" id="user-login" role="tabpanel" aria-labelledby="user-tab">
+                        <form action="{{ url_for('login') }}" method="POST" class="needs-validation" novalidate>
+                            <input type="hidden" name="role" value="user">
+                            <div class="mb-3">
+                                <label for="user-email" class="form-label text-secondary">Email address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-secondary"><i class="fa-solid fa-envelope"></i></span>
+                                    <input type="email" class="form-control form-control-glass" id="user-email" name="email" required placeholder="user@gmail.com">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="user-password" class="form-label text-secondary">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-secondary"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control form-control-glass" id="user-password" name="password" required placeholder="••••••••">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-cyan w-100 py-2.5 fs-5">Sign In as Rider</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Admin Login Form -->
+                    <div class="tab-pane fade {% if active_tab == 'admin' %}show active{% endif %}" id="admin-login" role="tabpanel" aria-labelledby="admin-tab">
+                        <form action="{{ url_for('admin_login') }}" method="POST" class="needs-validation" novalidate>
+                            <input type="hidden" name="role" value="admin">
+                            <div class="mb-3">
+                                <label for="admin-email" class="form-label text-secondary">Admin Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-secondary"><i class="fa-solid fa-envelope-open-text"></i></span>
+                                    <input type="email" class="form-control form-control-glass" id="admin-email" name="email" required placeholder="admin@gmail.com">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="admin-password" class="form-label text-secondary">Admin Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-secondary"><i class="fa-solid fa-lock"></i></span>
+                                    <input type="password" class="form-control form-control-glass" id="admin-password" name="password" required placeholder="••••••••">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-gradient-green w-100 py-2.5 fs-5">Authenticate Admin</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-secondary mb-0">Don't have a rider account? <a href="{{ url_for('register') }}" class="text-info text-decoration-none">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap validation starter script
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Register Rider - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="glass-card p-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">Create Rider Account</h2>
+                    <p class="text-secondary">Join Cyxlix for a smarter, greener commute</p>
+                </div>
+                
+                <form action="{{ url_for('register') }}" method="POST" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <h5 class="border-bottom pb-2 mb-3 fw-bold text-primary"><i class="fa-regular fa-id-card me-2 text-info"></i>Personal Information</h5>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label text-secondary">Full Name</label>
+                            <input type="text" class="form-control form-control-glass" id="name" name="name" required placeholder="Jane Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label text-secondary">Phone Number</label>
+                            <input type="tel" class="form-control form-control-glass" id="phone" name="phone" required placeholder="+91 9876543210">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label text-secondary">Email Address</label>
+                            <input type="email" class="form-control form-control-glass" id="email" name="email" required placeholder="jane@example.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password" class="form-label text-secondary">Password</label>
+                            <input type="password" class="form-control form-control-glass" id="password" name="password" required placeholder="••••••••">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label text-secondary">Confirm Password</label>
+                            <input type="password" class="form-control form-control-glass" id="confirm_password" name="confirm_password" required placeholder="••••••••">
+                        </div>
+                        
+                        <h5 class="border-bottom pb-2 mt-4 mb-3 fw-bold text-primary"><i class="fa-solid fa-sliders me-2 text-success"></i>Rider Preferences (For AI Recommendations)</h5>
+                        
+                        <div class="col-md-6">
+                            <label for="ride_purpose" class="form-label text-secondary">Primary Ride Purpose</label>
+                            <select class="form-select form-select-glass text-dark" id="ride_purpose" name="ride_purpose" required>
+                                <option value="" disabled selected>Select purpose...</option>
+                                <option value="Commute">Commute (Daily Office/School)</option>
+                                <option value="Fitness">Fitness & Sport</option>
+                                <option value="Mountain Trails">Mountain Trails / Offroad</option>
+                                <option value="Leisure">Leisure & Tourism</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="budget" class="form-label text-secondary">Hourly Rental Budget</label>
+                            <select class="form-select form-select-glass text-dark" id="budget" name="budget" required>
+                                <option value="" disabled selected>Select budget range...</option>
+                                <option value="Low">Low Budget (under ₹40/hr)</option>
+                                <option value="Medium">Medium Budget (₹40 - ₹80/hr)</option>
+                                <option value="High">Premium / Unlimited (₹80+/hr)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="distance" class="form-label text-secondary">Typical Ride Distance</label>
+                            <select class="form-select form-select-glass text-dark" id="distance" name="distance" required>
+                                <option value="" disabled selected>Select distance...</option>
+                                <option value="Short (1-5 km)">Short (1-5 km)</option>
+                                <option value="Medium (5-15 km)">Medium (5-15 km)</option>
+                                <option value="Long (15+ km)">Long (15+ km)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="terrain" class="form-label text-secondary">Preferred Road/Terrain</label>
+                            <select class="form-select form-select-glass text-dark" id="terrain" name="terrain" required>
+                                <option value="" disabled selected>Select terrain...</option>
+                                <option value="Paved">Paved Streets / Asphalt</option>
+                                <option value="Unpaved">Unpaved Dirt / Trails</option>
+                                <option value="Mixed">Mixed Terrains</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-gradient-cyan w-100 py-3 fs-5">Register Account</button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-secondary mb-0">Already registered? <a href="{{ url_for('login') }}" class="text-info text-decoration-none">Sign In here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Bootstrap validation starter script
+(() => {
+  'use strict'
+  const forms = document.querySelectorAll('.needs-validation')
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}

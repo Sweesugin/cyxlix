@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Dashboard Content -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom">
+                <h1 class="h2">Welcome back, {{ session.get('user_name', 'Rider') }}!</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{{ url_for('companion_mode') }}" class="btn btn-gradient-cyan"><i class="fa-solid fa-play me-2"></i>Start Ride Mode</a>
+                </div>
+            </div>
+
+            <!-- Stats Widgets Row -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card metric-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-secondary text-uppercase mb-1">CO₂ Savings</h6>
+                                <h3 class="mb-0">{{ "%.2f"|format(carbon_stats.total_co2) }} kg</h3>
+                            </div>
+                            <div class="metric-icon-container metric-icon-green">
+                                <i class="fa-solid fa-leaf"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card metric-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-secondary text-uppercase mb-1">Money Saved</h6>
+                                <h3 class="mb-0">₹{{ "%.2f"|format(carbon_stats.total_money) }}</h3>
+                            </div>
+                            <div class="metric-icon-container metric-icon-cyan">
+                                <i class="fa-solid fa-wallet"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card metric-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-secondary text-uppercase mb-1">Distance</h6>
+                                <h3 class="mb-0">{{ "%.1f"|format(carbon_stats.total_distance) }} km</h3>
+                            </div>
+                            <div class="metric-icon-container metric-icon-purple">
+                                <i class="fa-solid fa-route"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card metric-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-secondary text-uppercase mb-1">Eco Score</h6>
+                                <h3 class="mb-0">{{ carbon_stats.eco_score }} / 100</h3>
+                            </div>
+                            <div class="metric-icon-container metric-icon-green" style="background: rgba(245,158,11,0.15); color: #f59e0b; border-color: rgba(245,158,11,0.2);">
+                                <i class="fa-solid fa-award"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Splits -->
+            <div class="row g-4">
+                
+                <!-- Left Main Column (Active rentals, upcoming rides) -->
+                <div class="col-lg-8">
+                    <!-- Section: Active Bookings -->
+                    <div class="glass-card p-4 mb-4">
+                        <h4 class="mb-3 text-primary"><i class="fa-regular fa-clock me-2 text-info"></i>Active Bookings</h4>
+                        {% if active_bookings %}
+                            <div class="table-responsive">
+                                <table class="table-glass w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Cycle</th>
+                                            <th>Started At</th>
+                                            <th>Duration</th>
+                                            <th>Estimated Cost</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for booking in active_bookings %}
+                                        <tr>
+                                            <td class="fw-semibold">{{ booking.bicycle_name }}</td>
+                                            <td>{{ booking.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>{{ booking.duration_hours }} hr(s)</td>
+                                            <td class="text-success font-monospace">₹{{ "%.2f"|format(booking.rental_cost) }}</td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ url_for('companion_mode') }}" class="btn btn-sm btn-gradient-cyan"><i class="fa-solid fa-play"></i> Ride</a>
+                                                    <a href="{{ url_for('end_rental', booking_id=booking._id) }}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-circle-stop"></i> Return</a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-secondary mb-0 py-3">No active cycle rentals found. Need a ride? <a href="{{ url_for('bicycles_list') }}" class="text-info text-decoration-none">Browse bicycles</a>.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Section: Upcoming Scheduled Rides -->
+                    <div class="glass-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="mb-0 text-primary"><i class="fa-regular fa-calendar-days me-2 text-warning"></i>Upcoming Scheduled Rides</h4>
+                            <a href="{{ url_for('bicycles_list') }}" class="btn btn-sm btn-outline-glass">Schedule Ride</a>
+                        </div>
+                        {% if scheduled_rides %}
+                            <div class="table-responsive">
+                                <table class="table-glass w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Bicycle</th>
+                                            <th>Date / Time</th>
+                                            <th>Duration</th>
+                                            <th>Pickup Location</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for ride in scheduled_rides %}
+                                        <tr>
+                                            <td class="fw-semibold">{{ ride.bicycle_name }}</td>
+                                            <td>{{ ride.date }} at {{ ride.start_time }}</td>
+                                            <td>{{ ride.duration_hours }} hr(s)</td>
+                                            <td>{{ ride.pickup_location }}</td>
+                                            <td>
+                                                <a href="{{ url_for('cancel_schedule', schedule_id=ride._id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this scheduled ride?');">Cancel</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-secondary mb-0 py-3">No upcoming rides scheduled yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Column (Recommendations & Favorites) -->
+                <div class="col-lg-4">
+                    <!-- AI Recommendations -->
+                    <div class="glass-card p-4 mb-4" style="border-color: rgba(16,185,129,0.25);">
+                        <h5 class="mb-3 text-primary">
+                            <i class="fa-solid fa-wand-magic-sparkles me-2 text-success"></i>AI Recommended for You
+                        </h5>
+                        {% if recommended_bikes %}
+                            <div class="d-flex flex-column gap-3">
+                                {% for bike in recommended_bikes %}
+                                <div class="p-3 rounded bg-light border position-relative">
+                                    <span class="badge bg-success bg-opacity-70 text-white position-absolute top-0 end-0 m-2">
+                                        {{ bike.match_score }}% Match
+                                    </span>
+                                    <h6 class="fw-bold mb-1 pe-5">{{ bike.name }}</h6>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <span class="text-secondary fs-7"><i class="fa-solid fa-tags me-1"></i>₹{{ bike.price_per_hour }}/hr</span>
+                                        <span class="text-warning fs-7"><i class="fa-solid fa-star me-1"></i>{{ bike.average_rating }}</span>
+                                    </div>
+                                    <div class="d-flex gap-2 mt-3">
+                                        <a href="{{ url_for('bicycle_detail', bike_id=bike._id) }}" class="btn btn-sm btn-gradient-cyan w-100">Rent / Schedule</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-secondary mb-0 fs-7">No matches found. Try modifying your profile preferences.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Favorites Quick-look -->
+                    <div class="glass-card p-4">
+                        <h5 class="mb-3 text-primary"><i class="fa-solid fa-heart text-danger me-2"></i>My Favorites</h5>
+                        {% if favorites %}
+                            <div class="d-flex flex-column gap-3">
+                                {% for fav in favorites %}
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light border">
+                                    <div>
+                                        <h6 class="mb-0 fs-7 fw-bold">{{ fav.name }}</h6>
+                                        <span class="badge-status {{ fav.status }} mt-1 d-inline-block" style="font-size: 0.65rem;">{{ fav.status }}</span>
+                                    </div>
+                                    <a href="{{ url_for('bicycle_detail', bike_id=fav._id) }}" class="btn btn-sm btn-outline-glass px-2 py-1"><i class="fa-solid fa-chevron-right"></i></a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-secondary mb-0 fs-7">You haven't added any bicycles to your favorites list yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

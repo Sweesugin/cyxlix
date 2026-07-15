@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Error - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="glass-card p-5 my-5 d-inline-block" style="max-width: 600px;">
+        <i class="fa-solid fa-triangle-exclamation text-danger display-1 mb-4"></i>
+        <h1 class="fw-bold mb-2 text-primary">{{ error_title }}</h1>
+        <h4 class="text-secondary mb-4">Status Code: {{ error_code }}</h4>
+        <p class="text-secondary fs-6 mb-4">{{ error_description }}</p>
+        
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('home') }}" class="btn btn-gradient-cyan px-4 py-2.5"><i class="fa-solid fa-house me-2"></i>Go Home</a>
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-glass px-4 py-2.5">Dashboard</a>
+            {% elif session.get('admin_id') %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-glass px-4 py-2.5">Admin Console</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

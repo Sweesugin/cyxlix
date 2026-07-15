@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Rent Bicycle - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom">
+                <h2 class="fw-bold text-primary"><i class="fa-solid fa-file-invoice-dollar me-2 text-info"></i>Rent Cycle Checkout</h2>
+                <a href="{{ url_for('bicycle_detail', bike_id=bike._id) }}" class="btn btn-outline-glass"><i class="fa-solid fa-chevron-left me-2"></i>Back to details</a>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left Column: Cycle & Guidelines -->
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100">
+                        <h4 class="mb-3 text-primary">Selected Cycle</h4>
+                        <div class="text-center py-3 bg-light border rounded mb-3">
+                            <img src="{{ bike.image_url }}" alt="{{ bike.name }}" class="img-fluid" style="max-height: 120px;">
+                        </div>
+                        <h5 class="fw-bold">{{ bike.name }}</h5>
+                        <p class="text-secondary fs-7 mb-3"><i class="fa-solid fa-map-pin text-danger me-1"></i>Location Station: {{ bike.location }}</p>
+                        
+                        <h6 class="border-top pt-3 mt-3 fw-bold"><i class="fa-solid fa-shield-halved me-2 text-warning"></i>Rental Guidelines</h6>
+                        <ul class="text-secondary fs-7 ps-3 mt-2">
+                            <li class="mb-1">Safety helmet must be worn at all times.</li>
+                            <li class="mb-1">Check brakes and tire pressure before starting.</li>
+                            <li class="mb-1">Lock the bicycle using the digital smart-lock whenever parked.</li>
+                            <li class="mb-1">Obey all local traffic and cycling rules.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column: Checkout Form -->
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100 border-info border-opacity-25">
+                        <h4 class="mb-3 text-primary">Rental Details</h4>
+                        
+                        <form action="{{ url_for('confirm_booking', bike_id=bike._id) }}" method="POST">
+                            <!-- Hidden Fields for JS Cost Estimator -->
+                            <input type="hidden" id="price_per_hour" value="{{ bike.price_per_hour }}">
+                            
+                            <div class="mb-4">
+                                <label for="duration" class="form-label text-secondary">Rental Duration (Hours)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fa-regular fa-clock"></i></span>
+                                    <input type="number" step="0.5" min="0.5" max="24" class="form-control form-control-glass" id="duration" name="duration" value="1.0" required>
+                                </div>
+                                <div class="form-text text-secondary" style="font-size: 0.75rem;">Minimum lease: 0.5 hours. Maximum: 24 hours.</div>
+                            </div>
+                            
+                            <!-- Cost Summaries Card -->
+                            <div class="p-3 bg-light border rounded mb-4">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary fs-7">Hourly Lease Rate:</span>
+                                    <span class="fw-semibold font-monospace">₹{{ "%.2f"|format(bike.price_per_hour) }}/hr</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-secondary fs-7">Estimated Cost:</span>
+                                    <span id="cost_estimate" class="text-success fw-bold font-monospace">₹0.00</span>
+                                </div>
+                                <div class="d-flex justify-content-between border-top pt-2 mt-2">
+                                    <span class="text-secondary fs-7"><i class="fa-solid fa-leaf text-success me-1"></i>Carbon-Saving Eco Impact:</span>
+                                    <span id="savings_estimate" class="text-info fw-semibold font-monospace">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-gradient-cyan w-100 py-3 fs-5"><i class="fa-solid fa-circle-check me-2"></i>Confirm Rental & Start Ride</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

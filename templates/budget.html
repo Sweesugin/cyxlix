@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Budget Planner - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom">
+        <h2 class="fw-bold text-primary"><i class="fa-solid fa-wallet text-info me-2"></i>Smart Budget Planner</h2>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-glass"><i class="fa-solid fa-house me-2"></i>Home</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Input Form -->
+        <div class="col-md-5">
+            <div class="glass-card p-4">
+                <h4 class="mb-3 text-primary">Planner Preferences</h4>
+                <p class="text-secondary fs-7 mb-4">Input details of your planned journey to find the most cost-effective and suitable bicycle.</p>
+                
+                <form action="{{ url_for('budget_planner') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="budget_limit" class="form-label text-secondary">Max Budget Limit (₹/Hour)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-indian-rupee-sign"></i></span>
+                            <input type="number" step="5" min="10" max="500" class="form-control form-control-glass" id="budget_limit" name="budget_limit" value="{{ search_params.budget_limit or '60.0' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="hours" class="form-label text-secondary">Lease Duration (Hours)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-regular fa-clock"></i></span>
+                            <input type="number" step="0.5" min="0.5" max="24" class="form-control form-control-glass" id="hours" name="hours" value="{{ search_params.hours or '2.0' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="distance_km" class="form-label text-secondary">Target Distance (km)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-route"></i></span>
+                            <input type="number" step="1" min="1" max="100" class="form-control form-control-glass" id="distance_km" name="distance_km" value="{{ search_params.distance_km or '10' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="ride_purpose" class="form-label text-secondary">Ride Purpose</label>
+                        <select class="form-select form-select-glass" id="ride_purpose" name="ride_purpose" required>
+                            <option value="Commute" {% if search_params.ride_purpose == 'Commute' %}selected{% endif %}>Daily Commute</option>
+                            <option value="Fitness" {% if search_params.ride_purpose == 'Fitness' %}selected{% endif %}>Fitness / Sports</option>
+                            <option value="Mountain Trails" {% if search_params.ride_purpose == 'Mountain Trails' %}selected{% endif %}>Mountain Trails</option>
+                            <option value="Leisure" {% if search_params.ride_purpose == 'Leisure' or not search_params.ride_purpose %}selected{% endif %}>Leisure / Touring</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-gradient-cyan w-100 py-2.5 fs-5">Calculate & Suggest</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: Suggestions Output -->
+        <div class="col-md-7">
+            {% if suggestions is not none %}
+                <h4 class="mb-4 text-primary"><i class="fa-solid fa-wand-magic-sparkles text-success me-2"></i>Suggested Rental Plans</h4>
+                {% if suggestions %}
+                    <div class="d-flex flex-column gap-4">
+                        {% for item in suggestions %}
+                        <div class="glass-card p-4 border-success border-opacity-20 position-relative">
+                            {% if item.is_nearest_fallback %}
+                            <div class="alert alert-warning py-2 mb-3 fs-7 border-0 bg-warning bg-opacity-25 text-dark">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i> No cycles matched your budget limit. Suggesting our closest budget option.
+                            </div>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold mb-1">{{ item.bike.name }}</h5>
+                                    <span class="badge bg-secondary">{{ item.bike.type }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="text-secondary fs-8 d-block">Est. Total Cost</span>
+                                    <h4 class="text-success fw-bold mb-0 font-monospace">₹{{ "%.2f"|format(item.estimated_cost) }}</h4>
+                                </div>
+                            </div>
+                            
+                            <p class="text-secondary fs-7 mb-3">{{ item.bike.description }}</p>
+                            
+                            <!-- Plan Comparison Row -->
+                            <div class="row g-2 border-top pt-3 mt-3">
+                                <div class="col-6 col-sm-4 text-center">
+                                    <span class="text-secondary fs-8 d-block">Hourly Price</span>
+                                    <span class="fw-semibold font-monospace">₹{{ item.bike.price_per_hour }}/hr</span>
+                                </div>
+                                <div class="col-6 col-sm-4 text-center">
+                                    <span class="text-secondary fs-8 d-block">CO₂ Saved</span>
+                                    <span class="text-success fw-semibold font-monospace">+{{ "%.2f"|format(item.carbon_saved) }} kg</span>
+                                </div>
+                                <div class="col-12 col-sm-4 text-center">
+                                    <span class="text-secondary fs-8 d-block">Estimated Savings vs Car</span>
+                                    <span class="text-info fw-semibold font-monospace">₹{{ "%.2f"|format(item.money_saved) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <a href="{{ url_for('bicycle_detail', bike_id=item.bike._id) }}" class="btn btn-gradient-cyan w-100">Select & Book</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="glass-card p-5 text-center border-danger border-opacity-25">
+                        <i class="fa-solid fa-face-frown text-secondary display-4 mb-3"></i>
+                        <h4>No Bicycles Found</h4>
+                        <p class="text-secondary mb-0">Try increasing your Max Budget Limit or selecting another criteria.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <!-- Initial State -->
+                <div class="glass-card p-5 text-center h-100 d-flex flex-column justify-content-center align-items-center">
+                    <i class="fa-solid fa-calculator text-secondary display-2 mb-3"></i>
+                    <h3>Compare Plans Instantly</h3>
+                    <p class="text-secondary mb-0" style="max-width: 400px;">Enter your budget parameters, estimated travel hours, and distance to view cost breakdowns and eco aggregates side-by-side.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

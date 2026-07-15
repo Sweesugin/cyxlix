@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Post Ride Review - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="glass-card p-5 border-warning border-opacity-25">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-primary">Rate Your Ride</h2>
+                    <p class="text-secondary">How did the cycle perform? Share your feedback to help other riders.</p>
+                </div>
+                
+                <form action="{{ url_for('submit_review') }}" method="POST">
+                    <!-- Target Bicycle -->
+                    <input type="hidden" name="bicycle_id" value="{{ bike._id }}">
+                    
+                    <div class="text-center py-3 bg-light border rounded mb-4">
+                        <h5 class="mb-1 fw-bold">{{ bike.name }}</h5>
+                        <span class="badge bg-secondary">{{ bike.type }}</span>
+                    </div>
+
+                    <!-- Star Rating Radio Group -->
+                    <div class="mb-4 text-center">
+                        <label class="form-label text-secondary d-block">Overall Rating</label>
+                        <div class="star-rating d-inline-flex">
+                            <input type="radio" id="star5" name="rating" value="5" required />
+                            <label for="star5" title="5 stars"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star4" name="rating" value="4" />
+                            <label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star3" name="rating" value="3" />
+                            <label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star2" name="rating" value="2" />
+                            <label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
+                            
+                            <input type="radio" id="star1" name="rating" value="1" />
+                            <label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
+                        </div>
+                    </div>
+
+                    <!-- Comments Text Box -->
+                    <div class="mb-4">
+                        <label for="review_text" class="form-label text-secondary">Comments / Feedback</label>
+                        <textarea class="form-control form-control-glass" id="review_text" name="review_text" rows="4" required placeholder="Tell us about the gears, brakes, suspension, or comfort..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-gradient-green w-100 py-3 fs-5">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

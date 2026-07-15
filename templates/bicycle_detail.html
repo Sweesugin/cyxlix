@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bike.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Back Button -->
+    <a href="{{ url_for('bicycles_list') }}" class="btn btn-outline-glass mb-4"><i class="fa-solid fa-arrow-left me-2"></i>Back to Fleet</a>
+    
+    <div class="row g-5">
+        <!-- Left Column: Specs & Images -->
+        <div class="col-lg-6">
+            <div class="glass-card p-4 text-center mb-4">
+                <img src="{{ bike.image_url }}" alt="{{ bike.name }}" class="img-fluid my-4" style="max-height: 220px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));">
+                <h3 class="fw-bold mb-2">{{ bike.name }}</h3>
+                <div class="d-flex justify-content-center align-items-center gap-3">
+                    <span class="badge bg-secondary px-3 py-2 fs-7">{{ bike.type }}</span>
+                    <span class="badge-status {{ bike.status }} fs-7">{{ bike.status }}</span>
+                </div>
+            </div>
+            
+            <!-- Specifications -->
+            <div class="glass-card p-4">
+                <h4 class="mb-3 text-primary"><i class="fa-solid fa-gears me-2 text-info"></i>Specifications</h4>
+                <table class="table table-borderless bg-transparent mb-0">
+                    <tbody>
+                        {% if bike.specifications.gears %}
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Gears / Derailleur</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.gears }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if bike.specifications.motor %}
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Motor Drive</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.motor }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if bike.specifications.battery %}
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Battery Capacity</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.battery }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Chassis / Frame</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.frame }}</td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Total Weight</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.weight }}</td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td class="text-secondary py-2.5">Braking System</td>
+                            <td class="py-2.5 fw-semibold">{{ bike.specifications.brakes }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-secondary py-2.5">Pickup Location</td>
+                            <td class="py-2.5 fw-semibold"><i class="fa-solid fa-map-pin text-danger me-1"></i>{{ bike.location }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Right Column: Booking & Scheduler / Queue -->
+        <div class="col-lg-6">
+            {% if bike.status == 'available' %}
+                <!-- 1. Rent Now Card -->
+                <div class="glass-card p-4 mb-4" style="border-color: rgba(2, 132, 199, 0.25);">
+                    <h4 class="mb-1 text-primary"><i class="fa-solid fa-bolt text-info me-2"></i>Rent Immediately</h4>
+                    <p class="text-secondary fs-7 mb-4">Start your ride right now by confirming your booking duration.</p>
+                    
+                    {% if session.get('user_id') %}
+                        <form action="{{ url_for('book_bicycle', bike_id=bike._id) }}" method="GET">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span class="text-secondary d-block fs-7">Hourly Rate</span>
+                                    <span class="text-success fw-bold fs-4">₹{{ "%.2f"|format(bike.price_per_hour) }}/hr</span>
+                                </div>
+                                <button type="submit" class="btn btn-gradient-cyan px-4 py-2.5"><i class="fa-solid fa-play me-2"></i>Book Now</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-glass w-100">Login to Rent Instantly</a>
+                    {% endif %}
+                </div>
+                
+                <!-- 2. Schedule Ride Card -->
+                <div class="glass-card p-4">
+                    <h4 class="mb-1 text-primary"><i class="fa-regular fa-calendar-days text-warning me-2"></i>Schedule Future Ride</h4>
+                    <p class="text-secondary fs-7 mb-4">Reserve this cycle for a specific date and time slot in the future.</p>
+                    
+                    {% if session.get('user_id') %}
+                        <form action="{{ url_for('schedule_ride', bike_id=bike._id) }}" method="GET">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-secondary d-block fs-7">Double-Booking Protected</span>
+                                    <span class="text-warning fw-semibold"><i class="fa-solid fa-shield-halved me-1"></i>Active Guard</span>
+                                </div>
+                                <button type="submit" class="btn btn-gradient-green px-4 py-2.5">Schedule Ride</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-glass w-100">Login to Schedule</a>
+                    {% endif %}
+                </div>
+                
+            {% else %}
+                <!-- Unavailable (Rented or Maintenance) -->
+                <div class="glass-card p-4 mb-4 text-center border-danger border-opacity-20">
+                    <i class="fa-solid fa-ban text-danger display-4 mb-3"></i>
+                    <h4 class="mb-2">Bicycle is Unavailable</h4>
+                    <p class="text-secondary mb-4">This cycle is currently {% if bike.status == 'rented' %}rented by another rider{% else %}undergoing maintenance checkups{% endif %}.</p>
+                    
+                    {% if bike.status == 'rented' %}
+                        <div class="p-3 bg-light rounded border mb-4 text-start">
+                            <h6 class="fw-bold mb-1"><i class="fa-solid fa-list-ol me-2 text-warning"></i>Waitlist Reservation Queue</h6>
+                            <p class="text-secondary fs-7 mb-3">Join the queue to book this bicycle as soon as it's returned. You will be notified in sequence.</p>
+                            <span class="badge bg-secondary mb-3 py-2 px-3">Current waitlist: {{ queue_count }} person(s)</span>
+                            
+                            {% if session.get('user_id') %}
+                                <form action="{{ url_for('join_queue', bike_id=bike._id) }}" method="POST">
+                                    <button type="submit" class="btn btn-gradient-green w-100">Join Reservation Queue</button>
+                                </form>
+                            {% else %}
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-glass w-100">Login to Join Queue</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div class="glass-card p-4 mt-5">
+        <h4 class="mb-4 text-primary"><i class="fa-regular fa-star text-warning me-2"></i>Rider Reviews ({{ reviews|length }})</h4>
+        
+        {% if reviews %}
+            <div class="d-flex flex-column gap-3">
+                {% for rev in reviews %}
+                <div class="p-3 bg-light rounded border">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-dark fw-bold me-2" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                {{ rev.user_name[0]|upper if rev.user_name else 'R' }}
+                            </div>
+                            <span class="fw-semibold">{{ rev.user_name }}</span>
+                        </div>
+                        <span class="text-secondary fs-7">{{ rev.timestamp.strftime('%Y-%m-%d') if rev.timestamp }}</span>
+                    </div>
+                    <!-- Stars -->
+                    <div class="mb-2">
+                        {% for i in range(rev.rating) %}
+                            <i class="fa-solid fa-star text-warning" style="font-size: 0.85rem;"></i>
+                        {% endfor %}
+                        {% for i in range(5 - rev.rating) %}
+                            <i class="fa-regular fa-star text-secondary" style="font-size: 0.85rem;"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="text-secondary mb-0 fs-7 italic">"{{ rev.review_text }}"</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-secondary mb-0">No reviews have been posted for this cycle yet. Be the first to ride and review!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

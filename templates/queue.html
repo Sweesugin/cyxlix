@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Bicycle Reservation Queue - Cyxlix{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-4 border-bottom">
+        <h2 class="fw-bold text-primary"><i class="fa-solid fa-list-ol text-info me-2"></i>Bicycle Reservation Queue</h2>
+        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-glass"><i class="fa-solid fa-chevron-left me-2"></i>Back to Dashboard</a>
+    </div>
+
+    <div class="glass-card p-4">
+        <h4 class="mb-3 text-primary">Your Active Waitlists</h4>
+        <p class="text-secondary fs-7 mb-4">When a rented bicycle you waitlisted is returned, you will be notified in sequence. You can manage or leave your waitlist positions below.</p>
+        
+        {% if queue_items %}
+            <div class="table-responsive">
+                <table class="table-glass w-100">
+                    <thead>
+                        <tr>
+                            <th>Bicycle</th>
+                            <th>Waitlist Position</th>
+                            <th>Joined At</th>
+                            <th>Cycle Status</th>
+                            <th>Waitlist Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in queue_items %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if item.bike_image %}
+                                        <img src="{{ item.bike_image }}" alt="{{ item.bicycle_name }}" class="img-fluid rounded border" style="width: 50px; height: 35px; object-fit: contain; background: #fff;">
+                                    {% endif %}
+                                    <div>
+                                        <span class="fw-semibold d-block">{{ item.bicycle_name }}</span>
+                                        {% if item.bike_rate %}
+                                            <span class="text-secondary fs-8">₹{{ "%.2f"|format(item.bike_rate) }}/hr</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary py-2 px-3 font-monospace fs-7">#{{ item.position }}</span>
+                            </td>
+                            <td class="fs-7 text-secondary">
+                                {{ item.joined_at.strftime('%Y-%m-%d %H:%M') if item.joined_at }}
+                            </td>
+                            <td>
+                                <span class="badge-status {{ item.bike_status or 'rented' }}">{{ item.bike_status or 'rented' }}</span>
+                            </td>
+                            <td>
+                                {% if item.status == 'notified' %}
+                                    <span class="badge bg-success text-white py-2 px-3"><i class="fa-solid fa-bell me-1"></i> Notified / Ready</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark py-2 px-3"><i class="fa-solid fa-hourglass-half me-1"></i> Waiting in line</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    {% if item.status == 'notified' or item.bike_status == 'available' %}
+                                        <a href="{{ url_for('bicycle_detail', bike_id=item.bicycle_id) }}" class="btn btn-sm btn-gradient-cyan"><i class="fa-solid fa-play"></i> Book Now</a>
+                                    {% else %}
+                                        <a href="{{ url_for('bicycle_detail', bike_id=item.bicycle_id) }}" class="btn btn-sm btn-outline-glass"><i class="fa-solid fa-magnifying-glass"></i> View Details</a>
+                                    {% endif %}
+                                    <form action="{{ url_for('leave_queue', queue_id=item._id) }}" method="POST" onsubmit="return confirm('Are you sure you want to leave the waitlist for this cycle?');" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash-can"></i> Leave</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-list-check text-secondary display-3 mb-3"></i>
+                <h5>You are not currently in any reservation queues.</h5>
+                <p class="text-secondary mb-4">If your desired bicycle is currently rented, you can join its waitlist queue from its details page.</p>
+                <a href="{{ url_for('bicycles_list') }}" class="btn btn-gradient-cyan"><i class="fa-solid fa-bicycle me-2"></i>Browse Bicycles</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
